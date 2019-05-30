@@ -15,8 +15,10 @@ float mu_1(float t);
 float mu_2(float t);
 
 int main(){
-    a[0]=1;
+    a[9999]=0;
+    b[9999]=5;
     b[0]=1;
+    a[0]=1;
     b[N-1]=3;
 
     for (int j = 0; j < N ; j++)
@@ -29,40 +31,64 @@ int main(){
     h = L / N;
     lambda = 0.00001*tau / (h * h);  //коэф Куранта
 
-    for (int j = 1; j < N ; j++)
-        a[j] = (-lambda/2)/(lambda*a[j-1]/2-1-lambda);
 
-   // for (int j = N-1; j > 0 ; j--)
-        b[j] = (-lambda/2)/(lambda*a[j-1]/2-1-lambda);
+    for (int j = 9998; j > 0 ; j--) {
+        a[j] = (lambda / 2) / (lambda * a[j + 1] / 2 - 1 - lambda);
 
-    for (int i = 0; i <= N; i++) {x[i] = i * L / N;}
-    for (int j = 0; j <= M; j++) {t[j] = j * T / M;}
+        // for (int j = N-1; j > 0 ; j--)
+        b[j] = ((lambda / 2)*b[j+1]+U0[j+1]) / (lambda * a[j + 1] / 2 - 1 - lambda);
+    }
+    Uxk[0]=5;
+  //  Uxk[9999]=U0[9999];
+    for (int j = 1; j < (N); j++){
+        Uxk[j] = Uxk[j-1]*a[j-1]+b[j-1];
+    }
 
-    for (int i = 0; i < N ; i++){
-        for (int j = 0; j < M ; j++){
-            u[i][j] = 0.0;
+  //  for (int i = 0; i <= N; i++) {x[i] = i * L / N;}
+  //  for (int j = 0; j <= M; j++) {t[j] = j * T / M;}
+
+         int i=0;
+        for (int j = 0; j < N ; j++){
+            u[i][j] = Uxk[j];
         }
-    }
 
-    for (int j = 0; j < M; j++){
-        u[0][j] = mu_1(t[j]);
-    }
+        for (int i = 1; i < N ; i++){
 
-    for (int j = 0; j < M; j++){
+            for (int j = 9998; j > 0 ; j--) {
+                a[j] = (lambda / 2) / (lambda * a[j + 1] / 2 - 1 - lambda);
+
+                // for (int j = N-1; j > 0 ; j--)
+                b[j] = ((lambda / 2)*b[j+1]+u[i-1][j+1]) / (lambda * a[j + 1] / 2 - 1 - lambda);
+            }
+            Uxk[0]=5;
+            //  Uxk[9999]=U0[9999];
+            for (int j = 1; j < (N); j++){
+                Uxk[j] = Uxk[j-1]*a[j-1]+b[j-1];
+            }
+            for (int j = 0; j < N ; j++){
+                u[i][j] = Uxk[j];
+            }
+        }
+
+  //  for (int j = 0; j < M; j++){
+  //      u[0][j] = mu_1(t[j]);
+  //  }
+
+ /*   for (int j = 0; j < M; j++){
         u[N-1][j] = mu_2(t[j]);
     }
 
     for (int i = 1; i < N-1; i++){
         u[i][0] = 5/*fi(i+1)*/;
-    }
+   // }
 
-    for (int j = 0; j < M-1 ; j++){
+  /*  for (int j = 0; j < M-1 ; j++){
         for (int i = 1; i < N-1; i++){
             u[i][j+1] = lambda /2 * u[i+1][j] + lambda/2 * u[i-1][j] + (1.0 - lambda) * u[i][j];
             u[i][j+1] = lambda /2 * u[i+1][j] + lambda/2 * u[i-1][j] + (1.0 - lambda) * u[i][j]; //+ tau * f(x[i], t[j]);
         }
     }
-
+*/
     /*  for (int j = M; j > 0; j--){
           for (int i = 0; i < N; i++){
               printf("%5.3f ", u[i][j]);
@@ -71,7 +97,7 @@ int main(){
       }*/
 
     ofstream f;
-    f.open("test150519.txt");
+    f.open("test230519.txt");
     /*   for(int i=0; i<4; i++)    // или так
            f << m[i] << endl;*/
 
